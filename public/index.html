@@ -1,0 +1,53 @@
+<!-- public/index.html -->
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ShadowGPT API — demo</title>
+  <style>
+    body { font-family: Inter, system-ui, sans-serif; padding: 24px; background:#0b1220; color:#e6eef8; }
+    textarea { width:100%; height:120px; padding:12px; border-radius:8px; border:1px solid #334155; background:#071024; color:#e6eef8 }
+    button { padding:10px 16px; border-radius:8px; background:#6d28d9; color:white; border:none; cursor:pointer }
+    .reply { margin-top:16px; white-space:pre-wrap; background:#071024; padding:12px; border-radius:8px; border:1px solid #1e293b }
+  </style>
+</head>
+<body>
+  <h1>ShadowGPT API — demo</h1>
+  <p>Make sure to set <code>x-api-key</code> header with your server API key. See README for full details.</p>
+
+  <textarea id="prompt" placeholder="Type your message...">Hello, introduce yourself.</textarea>
+  <div style="margin-top:10px">
+    <button id="send">Send</button>
+  </div>
+
+  <div class="reply" id="reply"></div>
+
+  <script>
+    document.getElementById("send").addEventListener("click", async () => {
+      const prompt = document.getElementById("prompt").value;
+      document.getElementById("reply").textContent = "Thinking...";
+
+      try {
+        const res = await fetch("/api/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            // Replace the header value below with your server key while testing locally
+            "x-api-key": "changeme_local_key"
+          },
+          body: JSON.stringify({ message: prompt })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          document.getElementById("reply").textContent = data.reply || JSON.stringify(data.raw, null, 2);
+        } else {
+          document.getElementById("reply").textContent = "Error: " + JSON.stringify(data);
+        }
+      } catch (err) {
+        document.getElementById("reply").textContent = "Network error: " + err.message;
+      }
+    });
+  </script>
+</body>
+</html>
